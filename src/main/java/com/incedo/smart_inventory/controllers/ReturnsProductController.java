@@ -71,7 +71,7 @@ public class ReturnsProductController {
 
         Optional<ReturnsProduct> returnsProduct = returnsProductRepository.findById(id);
         if (returnsProduct.isPresent()) {
-            return new ResponseEntity<ReturnsProduct>(returnsProduct.get(), HttpStatus.FOUND);
+            return new ResponseEntity<ReturnsProduct>(returnsProduct.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<ReturnsProduct>(HttpStatus.NOT_FOUND);
         }

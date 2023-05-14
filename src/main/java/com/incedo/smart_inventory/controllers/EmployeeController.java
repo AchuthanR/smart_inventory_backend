@@ -132,7 +132,7 @@ public class EmployeeController {
 
         Optional<Employee> employee = employeeRepository.findById(id);
         if (employee.isPresent()) {
-            return new ResponseEntity<Employee>(employee.get(), HttpStatus.FOUND);
+            return new ResponseEntity<Employee>(employee.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<String>("Employee with the given id not found.", HttpStatus.NOT_FOUND);
         }
