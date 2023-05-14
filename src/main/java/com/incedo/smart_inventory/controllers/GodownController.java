@@ -91,6 +91,10 @@ public class GodownController {
 				return new ResponseEntity<String>("Employee with the given id is not found",HttpStatus.NOT_FOUND);
 			}
 			
+			if (employeeFound.get().getGodown() != null && employeeFound.get().getId() == employeeFound.get().getGodown().getManager().getId()) {
+				return new ResponseEntity<String>("This employee is already a manager to another godown", HttpStatus.BAD_REQUEST);
+			}
+			
 			godown.setManager(employeeFound.get());
 		}
 		else if (godown.getManager() != null) {
@@ -102,10 +106,10 @@ public class GodownController {
 				}
 				
 				godown.getManager().setRole(employeeRoleFound.get());
-				godown.getManager().setGodown(godown);
 			}
 			
-			godown.getManager().setPassword(BCrypt.hashpw(godown.getManager().getPassword(), BCrypt.gensalt()));
+			godown.getManager().setPassword(BCrypt.hashpw(godown.getManager().getUsername(), BCrypt.gensalt()));
+			godown.getManager().setIsLocked(false);
 		}
 
 		godown.getManager().setGodown(null);
@@ -132,8 +136,12 @@ public class GodownController {
 		if (godown.getManager() != null && godown.getManager().getId() > 0) {
 			Optional<Employee> employeeFound = employeeRepository.findById(godown.getManager().getId());
 			
-			if(employeeFound.isEmpty()) {
-				return new ResponseEntity<String>("The employee with the given id is not found",HttpStatus.NOT_FOUND);
+			if (employeeFound.isEmpty()) {
+				return new ResponseEntity<String>("The employee with the given id is not found", HttpStatus.NOT_FOUND);
+			}
+			
+			if (employeeFound.get().getGodown() != null && employeeFound.get().getId() == employeeFound.get().getGodown().getManager().getId()) {
+				return new ResponseEntity<String>("This employee is already a manager to another godown", HttpStatus.BAD_REQUEST);
 			}
 			
 			godown.setManager(employeeFound.get());
@@ -150,6 +158,7 @@ public class GodownController {
 			}
 			
 			godown.getManager().setPassword(BCrypt.hashpw(godown.getManager().getPassword(), BCrypt.gensalt()));
+			godown.getManager().setIsLocked(false);
 		}
 		
 		godown.getManager().setGodown(null);
@@ -160,7 +169,19 @@ public class GodownController {
 	}
 	
 	@DeleteMapping(path=PATH + "/{id}")
-	public ResponseEntity<Void> deleteEntity(@PathVariable int id) {
+	public ResponseEntity<String> deleteEntity(@PathVariable int id) {
+		Optional<Godown> godownFound = godownRepository.findById(id);
+		
+		if (godownFound.isEmpty()) {
+			return new ResponseEntity<String>("The godown with the given id is not found", HttpStatus.NOT_FOUND);
+		}
+		
+		Optional<Employee> managerFound = employeeRepository.findById(godownFound.get().getManager().getId());
+		if (managerFound.isPresent()) {
+			managerFound.get().setGodown(null);
+			employeeRepository.save(managerFound.get());
+		}
+		
 		godownRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

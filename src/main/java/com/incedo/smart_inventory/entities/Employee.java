@@ -38,6 +38,7 @@ public class Employee {
 	@OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	private Godown godown = null;
 	
+	@NotNull
 	@Column(name = "isLocked", columnDefinition = "BOOLEAN DEFAULT false")
 	private Boolean isLocked = null;
 

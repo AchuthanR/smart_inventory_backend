@@ -37,7 +37,7 @@ public class Godown {
 	@NotNull
 	@JsonIgnoreProperties(value = { "godown" }, allowGetters = false, allowSetters = true)
 	@JoinColumn(unique = true)
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	private Employee manager = null;
 	
 	@NotNull

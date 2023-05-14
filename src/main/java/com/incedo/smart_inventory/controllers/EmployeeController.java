@@ -139,7 +139,17 @@ public class EmployeeController {
     }
 	
 	@DeleteMapping(path=PATH + "/{id}")
-	public ResponseEntity<Void> deleteEmployee(@PathVariable int id) {
+	public ResponseEntity deleteEmployee(@PathVariable int id) {
+		Optional<Employee> employee = employeeRepository.findById(id);
+		
+		if (employee.isEmpty()) {
+            return new ResponseEntity<String>("Employee with the given id not found.", HttpStatus.NOT_FOUND);
+        }
+		
+		if (employee.get().getGodown() != null && employee.get().getId() == employee.get().getGodown().getManager().getId()) {
+			return new ResponseEntity<ErrorData>(new ErrorData("RESOURCE_STILL_REFERENCED", "This employee is a manager of a godown"), HttpStatus.BAD_REQUEST);
+		}
+		
 		employeeRepository.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -176,11 +186,17 @@ public class EmployeeController {
 			employee.setPassword(employeeFound.get().getPassword());
 		}
 		
+		employee.setIsLocked(employeeFound.get().getIsLocked());
+
 		if (employee.getGodown() != null && employee.getGodown().getId() > 0) {
 			Optional<Godown> godownFound = godownRepository.findById(employee.getGodown().getId());
 			
 			if (godownFound.isEmpty()) {
 				return new ResponseEntity<String>("Godown with the given id not found.", HttpStatus.NOT_FOUND);
+			}
+			
+			if (employee.getId() == employeeFound.get().getGodown().getManager().getId() && employeeFound.get().getGodown().getId() != employee.getGodown().getId()) {
+				return new ResponseEntity<String>("This employee is a manager of a godown.", HttpStatus.BAD_REQUEST);
 			}
 			
 			employee.setGodown(godownFound.get());
@@ -189,8 +205,6 @@ public class EmployeeController {
 				employee.getGodown().setManager(employee);
 			}
 		}
-		
-		employee.setIsLocked(employeeFound.get().getIsLocked());
 		
 		Employee saved = employeeRepository.save(employee);
 		return new ResponseEntity<Employee>(saved, HttpStatus.OK);
