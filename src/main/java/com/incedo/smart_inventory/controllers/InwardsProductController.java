@@ -278,8 +278,13 @@ public class InwardsProductController {
 		ProductsStockCompositeKey productsStockCompositeKey = new ProductsStockCompositeKey(inwardsProductFound.get().getProduct().getId(), inwardsProductFound.get().getGodown().getId());
 		Optional<ProductsStock> productsStockFound = productsStockRepository.findById(productsStockCompositeKey);
 		if (productsStockFound.isPresent()) {
-			productsStockFound.get().setStock(productsStockFound.get().getStock() - inwardsProductFound.get().getQuantity());
-			productsStockRepository.save(productsStockFound.get());
+			if (productsStockFound.get().getStock() - inwardsProductFound.get().getQuantity() == 0) {
+				productsStockRepository.deleteById(productsStockCompositeKey);
+			}
+			else {
+				productsStockFound.get().setStock(productsStockFound.get().getStock() - inwardsProductFound.get().getQuantity());
+				productsStockRepository.save(productsStockFound.get());
+			}
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);

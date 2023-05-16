@@ -253,8 +253,13 @@ public class ReturnsProductController {
 		ProductsStockCompositeKey productsStockCompositeKey = new ProductsStockCompositeKey(returnsProductFound.get().getProduct().getId(), returnsProductFound.get().getGodown().getId());
 		Optional<ProductsStock> productsStockFound = productsStockRepository.findById(productsStockCompositeKey);
 		if (productsStockFound.isPresent()) {
-			productsStockFound.get().setStock(productsStockFound.get().getStock() - returnsProductFound.get().getQuantity());
-			productsStockRepository.save(productsStockFound.get());
+			if (productsStockFound.get().getStock() - returnsProductFound.get().getQuantity() == 0) {
+				productsStockRepository.deleteById(productsStockCompositeKey);
+			}
+			else {
+				productsStockFound.get().setStock(productsStockFound.get().getStock() - returnsProductFound.get().getQuantity());
+				productsStockRepository.save(productsStockFound.get());
+			}
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);

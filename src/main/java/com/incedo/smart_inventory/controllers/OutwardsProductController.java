@@ -130,8 +130,13 @@ public class OutwardsProductController {
 		ProductsStockCompositeKey productsStockCompositeKey = new ProductsStockCompositeKey(outwardsProduct.getProduct().getId(), outwardsProduct.getGodown().getId());
 		Optional<ProductsStock> productsStockFound = productsStockRepository.findById(productsStockCompositeKey);
 		if (productsStockFound.isPresent()) {
-			productsStockFound.get().setStock(productsStockFound.get().getStock() - outwardsProduct.getQuantity());
-			productsStockRepository.save(productsStockFound.get());
+			if (productsStockFound.get().getStock() - outwardsProduct.getQuantity() == 0) {
+				productsStockRepository.deleteById(productsStockCompositeKey);
+			}
+			else {
+				productsStockFound.get().setStock(productsStockFound.get().getStock() - outwardsProduct.getQuantity());
+				productsStockRepository.save(productsStockFound.get());
+			}
 		}
 		
 		return new ResponseEntity<OutwardsProduct>(saved, HttpStatus.CREATED);
@@ -219,8 +224,13 @@ public class OutwardsProductController {
 			productsStockCompositeKey = new ProductsStockCompositeKey(outwardsProduct.getProduct().getId(), outwardsProduct.getGodown().getId());
 			productsStockFound = productsStockRepository.findById(productsStockCompositeKey);
 			if (productsStockFound.isPresent()) {
-				productsStockFound.get().setStock(productsStockFound.get().getStock() - outwardsProduct.getQuantity());
-				productsStockRepository.save(productsStockFound.get());
+				if (productsStockFound.get().getStock() - outwardsProduct.getQuantity() == 0) {
+					productsStockRepository.deleteById(productsStockCompositeKey);
+				}
+				else {
+					productsStockFound.get().setStock(productsStockFound.get().getStock() - outwardsProduct.getQuantity());
+					productsStockRepository.save(productsStockFound.get());
+				}
 			}
 		}
 		
