@@ -28,6 +28,7 @@ import com.incedo.smart_inventory.SmartInventoryApplication;
 import com.incedo.smart_inventory.entities.EmployeeRoles;
 import com.incedo.smart_inventory.repositories.EmployeeRolesRepository;
 
+@Order(1)
 public class EmployeeRolesControllerTests extends AbstractTest {
 	
 	@Autowired
@@ -35,7 +36,7 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 	
 	@Test
 	@Order(1)
-	public void testCreate() throws Exception {
+	public void testCreateEmployeeRole1() throws Exception {
 		EmployeeRoles employeeRoles = new EmployeeRoles();
 		employeeRoles.setId(1);
 		employeeRoles.setRole("superadmin");
@@ -56,9 +57,72 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 	
 	@Test
 	@Order(2)
-	public void testCreateWithNullValue() throws Exception {
+	public void testCreateEmployeeRole2() throws Exception {
 		EmployeeRoles employeeRoles = new EmployeeRoles();
 		employeeRoles.setId(2);
+		employeeRoles.setRole("manager");
+		
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/employeeRoles")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(mapToJson(employeeRoles)))
+				.andReturn();
+	   
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(201, status);
+		String content = mvcResult.getResponse().getContentAsString();
+		EmployeeRoles createdEmployeeRoles = super.mapFromJson(content, EmployeeRoles.class);
+		assertTrue(createdEmployeeRoles.getId() == 2);
+		
+		assertTrue(employeeRolesRepository.findById(2).isPresent());
+	}
+	
+	@Test
+	@Order(3)
+	public void testCreateEmployeeRole3() throws Exception {
+		EmployeeRoles employeeRoles = new EmployeeRoles();
+		employeeRoles.setId(3);
+		employeeRoles.setRole("employee");
+		
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/employeeRoles")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(mapToJson(employeeRoles)))
+				.andReturn();
+	   
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(201, status);
+		String content = mvcResult.getResponse().getContentAsString();
+		EmployeeRoles createdEmployeeRoles = super.mapFromJson(content, EmployeeRoles.class);
+		assertTrue(createdEmployeeRoles.getId() == 3);
+		
+		assertTrue(employeeRolesRepository.findById(3).isPresent());
+	}
+	
+	@Test
+	@Order(3)
+	public void testCreate() throws Exception {
+		EmployeeRoles employeeRoles = new EmployeeRoles();
+		employeeRoles.setId(4);
+		employeeRoles.setRole("admin");
+		
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/employeeRoles")
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(mapToJson(employeeRoles)))
+				.andReturn();
+	   
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(201, status);
+		String content = mvcResult.getResponse().getContentAsString();
+		EmployeeRoles createdEmployeeRoles = super.mapFromJson(content, EmployeeRoles.class);
+		assertTrue(createdEmployeeRoles.getId() == 4);
+		
+		assertTrue(employeeRolesRepository.findById(4).isPresent());
+	}
+	
+	@Test
+	@Order(5)
+	public void testCreateWithNullValue() throws Exception {
+		EmployeeRoles employeeRoles = new EmployeeRoles();
+		employeeRoles.setId(5);
 		employeeRoles.setRole(null);
 		
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/employeeRoles")
@@ -69,11 +133,11 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(400, status);
 		
-		assertTrue(employeeRolesRepository.findById(2).isEmpty());
+		assertTrue(employeeRolesRepository.findById(5).isEmpty());
 	}
 	
 	@Test
-	@Order(3)
+	@Order(6)
 	public void testReadAll() throws Exception {
 		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/employeeRoles")
 				.accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
@@ -86,12 +150,12 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 	}
 	
 	@Test
-	@Order(4)
+	@Order(7)
 	public void testUpdate() throws Exception {
 	   EmployeeRoles employeeRoles = new EmployeeRoles();
-	   employeeRoles.setRole("manager");
+	   employeeRoles.setRole("user");
 	   
-	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/api/employeeRoles/1")
+	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/api/employeeRoles/4")
 			   .contentType(MediaType.APPLICATION_JSON_VALUE)
 			   .content(mapToJson(employeeRoles))).andReturn();
 	   
@@ -99,17 +163,17 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 	   assertEquals(200, status);
 	   String content = mvcResult.getResponse().getContentAsString();
 	   EmployeeRoles updatedEmployeeRoles = super.mapFromJson(content, EmployeeRoles.class);
-	   assertTrue(updatedEmployeeRoles.getId() == 1);
-	   assertTrue(updatedEmployeeRoles.getRole().equals("manager"));
+	   assertTrue(updatedEmployeeRoles.getId() == 4);
+	   assertTrue(updatedEmployeeRoles.getRole().equals("user"));
 	}
 	
 	@Test
-	@Order(5)
+	@Order(8)
 	public void testUpdateNotExistingResource() throws Exception {
 	   EmployeeRoles employeeRoles = new EmployeeRoles();
-	   employeeRoles.setRole("employee");
+	   employeeRoles.setRole("user");
 	   
-	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/api/employeeRoles/2")
+	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/api/employeeRoles/5")
 			   .contentType(MediaType.APPLICATION_JSON_VALUE)
 			   .content(mapToJson(employeeRoles))).andReturn();
 	   
@@ -118,9 +182,9 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 	}
 	
 	@Test
-	@Order(6)
+	@Order(9)
 	public void testDelete() throws Exception {
-	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/employeeRoles/1"))
+	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/employeeRoles/4"))
 			   .andReturn();
 	   
 	   int status = mvcResult.getResponse().getStatus();
@@ -128,9 +192,9 @@ public class EmployeeRolesControllerTests extends AbstractTest {
 	}
 	
 	@Test
-	@Order(7)
+	@Order(10)
 	public void testDeleteNotExistingResource() throws Exception {
-	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/employeeRoles/2"))
+	   MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/api/employeeRoles/5"))
 			   .andReturn();
 	   
 	   int status = mvcResult.getResponse().getStatus();

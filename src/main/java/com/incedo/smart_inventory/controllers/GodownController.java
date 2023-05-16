@@ -112,7 +112,9 @@ public class GodownController {
 			godown.getManager().setIsLocked(false);
 		}
 
-		godown.getManager().setGodown(null);
+		if (godown.getManager() != null) {
+			godown.getManager().setGodown(null);
+		}
 		Godown saved = godownRepository.save(godown);
 		saved.getManager().setGodown(saved);
 		saved = godownRepository.save(saved);
@@ -161,7 +163,9 @@ public class GodownController {
 			godown.getManager().setIsLocked(false);
 		}
 		
-		godown.getManager().setGodown(null);
+		if (godown.getManager() != null) {
+			godown.getManager().setGodown(null);
+		}
 		Godown saved = godownRepository.save(godown);
 		saved.getManager().setGodown(saved);
 		saved = godownRepository.save(saved);
