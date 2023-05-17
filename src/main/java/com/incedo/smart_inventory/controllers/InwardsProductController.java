@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.incedo.smart_inventory.controllers.models.ErrorData;
 import com.incedo.smart_inventory.entities.Employee;
 import com.incedo.smart_inventory.entities.Godown;
 import com.incedo.smart_inventory.entities.InvoiceReceived;
@@ -140,12 +141,11 @@ public class InwardsProductController {
 		
 		
 		if (inwardsProduct.getGodown() != null && inwardsProduct.getProduct() != null) {
-			
-			if(inwardsProduct.getGodown().getCapacityInQuintals()-productsStockRepository.findProductsStockByGodownId(inwardsProduct.getGodown().getId())
+			if (productsStockRepository.findProductsStockByGodownId(inwardsProduct.getGodown().getId())
 					.stream()
 					.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
-					.sum() > (inwardsProduct.getQuantity() * inwardsProduct.getProduct().getWeight()) + (inwardsProduct.getQuantity() * inwardsProduct.getProduct().getWeight()) ) {
-				return new ResponseEntity<String>("The remaining capactity is less than the inwards quantity",HttpStatus.BAD_REQUEST);
+					.sum() + (inwardsProduct.getQuantity() * inwardsProduct.getProduct().getWeight()) > inwardsProduct.getGodown().getCapacityInQuintals()) {
+				return new ResponseEntity<ErrorData>(new ErrorData("OUT_OF_CAPACITY", "The remaining capactity is less than the inwards quantity"), HttpStatus.BAD_REQUEST);
 			}
 		}
 		
@@ -244,12 +244,11 @@ public class InwardsProductController {
 		}
 		
 		if (inwardsProduct.getGodown() != null && inwardsProduct.getProduct() != null) {
-	
-			if(productsStockRepository.findProductsStockByGodownId(inwardsProduct.getGodown().getId())
+			if (productsStockRepository.findProductsStockByGodownId(inwardsProduct.getGodown().getId())
 					.stream()
 					.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
 					.sum() - (inwardsProductFound.get().getQuantity() * inwardsProductFound.get().getProduct().getWeight()) + (inwardsProduct.getQuantity() * inwardsProduct.getProduct().getWeight()) > inwardsProduct.getGodown().getCapacityInQuintals()) {
-				return new ResponseEntity<String>("The remaining capactity is less than the inwards quantity",HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<ErrorData>(new ErrorData("OUT_OF_CAPACITY", "The remaining capactity is less than the inwards quantity"), HttpStatus.BAD_REQUEST);
 			}
 		}
 		

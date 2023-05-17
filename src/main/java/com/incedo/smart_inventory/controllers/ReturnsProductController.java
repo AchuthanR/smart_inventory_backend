@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.incedo.smart_inventory.controllers.models.ErrorData;
 import com.incedo.smart_inventory.entities.Employee;
 import com.incedo.smart_inventory.entities.Godown;
 import com.incedo.smart_inventory.entities.InvoiceIssued;
@@ -142,11 +143,11 @@ public class ReturnsProductController {
 		
 		if (returnsProduct.getGodown() != null && returnsProduct.getProduct() != null) {
 			
-			if(productsStockRepository.findProductsStockByGodownId(returnsProduct.getGodown().getId())
+			if (productsStockRepository.findProductsStockByGodownId(returnsProduct.getGodown().getId())
 					.stream()
 					.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
 					.sum() - (returnsProductFound.get().getQuantity() * returnsProductFound.get().getProduct().getWeight()) + (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) > returnsProduct.getGodown().getCapacityInQuintals()) {
-				return new ResponseEntity<String>("The remaining capactity is less than the inwards quantity",HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<ErrorData>(new ErrorData("OUT_OF_CAPACITY", "The remaining capactity is less than the returns quantity"), HttpStatus.BAD_REQUEST);
 			}
 		}
 		
@@ -230,15 +231,14 @@ public class ReturnsProductController {
 			}
 		}
 		
-	if (returnsProduct.getGodown() != null && returnsProduct.getProduct() != null) {
-				
-				if(returnsProduct.getGodown().getCapacityInQuintals()-productsStockRepository.findProductsStockByGodownId(returnsProduct.getGodown().getId())
-						.stream()
-						.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
-						.sum() > (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) + (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) ) {
-					return new ResponseEntity<String>("The remaining capactity is less than the inwards quantity",HttpStatus.BAD_REQUEST);
-				}
+		if (returnsProduct.getGodown() != null && returnsProduct.getProduct() != null) {
+			if (productsStockRepository.findProductsStockByGodownId(returnsProduct.getGodown().getId())
+					.stream()
+					.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
+					.sum() + (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) > returnsProduct.getGodown().getCapacityInQuintals()) {
+				return new ResponseEntity<ErrorData>(new ErrorData("OUT_OF_CAPACITY", "The remaining capactity is less than the returns quantity"), HttpStatus.BAD_REQUEST);
 			}
+		}
 		
 		ReturnsProduct saved = returnsProductRepository.save(returnsProduct);
 		
