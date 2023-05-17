@@ -91,10 +91,6 @@ public class GodownController {
 				return new ResponseEntity<String>("Employee with the given id is not found",HttpStatus.NOT_FOUND);
 			}
 			
-			if (employeeFound.get().getGodown() != null && employeeFound.get().getId() == employeeFound.get().getGodown().getManager().getId()) {
-				return new ResponseEntity<String>("This employee is already a manager to another godown", HttpStatus.BAD_REQUEST);
-			}
-			
 			godown.setManager(employeeFound.get());
 		}
 		else if (godown.getManager() != null) {
@@ -140,10 +136,6 @@ public class GodownController {
 			
 			if (employeeFound.isEmpty()) {
 				return new ResponseEntity<String>("The employee with the given id is not found", HttpStatus.NOT_FOUND);
-			}
-			
-			if (employeeFound.get().getGodown() != null && employeeFound.get().getId() == employeeFound.get().getGodown().getManager().getId()) {
-				return new ResponseEntity<String>("This employee is already a manager to another godown", HttpStatus.BAD_REQUEST);
 			}
 			
 			godown.setManager(employeeFound.get());
