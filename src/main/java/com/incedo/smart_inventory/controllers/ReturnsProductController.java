@@ -140,6 +140,16 @@ public class ReturnsProductController {
 			}
 		}
 		
+		if (returnsProduct.getGodown() != null && returnsProduct.getProduct() != null) {
+			
+			if(productsStockRepository.findProductsStockByGodownId(returnsProduct.getGodown().getId())
+					.stream()
+					.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
+					.sum() - (returnsProductFound.get().getQuantity() * returnsProductFound.get().getProduct().getWeight()) + (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) > returnsProduct.getGodown().getCapacityInQuintals()) {
+				return new ResponseEntity<String>("The remaining capactity is less than the inwards quantity",HttpStatus.BAD_REQUEST);
+			}
+		}
+		
 		Integer previousQuantity = returnsProductFound.get().getQuantity();
 		Product previousProduct = returnsProductFound.get().getProduct();
 		Godown previousGodown = returnsProductFound.get().getGodown();
@@ -219,6 +229,16 @@ public class ReturnsProductController {
 				}
 			}
 		}
+		
+	if (returnsProduct.getGodown() != null && returnsProduct.getProduct() != null) {
+				
+				if(returnsProduct.getGodown().getCapacityInQuintals()-productsStockRepository.findProductsStockByGodownId(returnsProduct.getGodown().getId())
+						.stream()
+						.mapToDouble(item -> item.getStock() * item.getProduct().getWeight())
+						.sum() > (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) + (returnsProduct.getQuantity() * returnsProduct.getProduct().getWeight()) ) {
+					return new ResponseEntity<String>("The remaining capactity is less than the inwards quantity",HttpStatus.BAD_REQUEST);
+				}
+			}
 		
 		ReturnsProduct saved = returnsProductRepository.save(returnsProduct);
 		
