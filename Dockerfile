@@ -1,3 +1,9 @@
+# Use the arm64v8/ubuntu base image
+FROM arm64v8/ubuntu
+
+# Install dependencies and configure your application
+RUN apt-get update && apt-get install -y docker.io
+
 #
 # Build stage
 #
