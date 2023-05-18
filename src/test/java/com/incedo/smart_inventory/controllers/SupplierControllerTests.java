@@ -29,6 +29,7 @@ import com.incedo.smart_inventory.entities.Product;
 import com.incedo.smart_inventory.entities.Supplier;
 import com.incedo.smart_inventory.repositories.SupplierRepository;
 
+@Order(5)
 public class SupplierControllerTests extends AbstractTest{
 	
 	@Autowired

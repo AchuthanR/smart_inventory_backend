@@ -28,6 +28,7 @@ import com.incedo.smart_inventory.entities.EmployeeRoles;
 import com.incedo.smart_inventory.entities.Product;
 import com.incedo.smart_inventory.repositories.ProductRepository;
 
+@Order(4)
 public class ProductControllerTests extends AbstractTest {
 	@Autowired
 	ProductRepository productRepository;
