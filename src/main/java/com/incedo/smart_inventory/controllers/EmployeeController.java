@@ -195,7 +195,7 @@ public class EmployeeController {
 				return new ResponseEntity<String>("Godown with the given id not found.", HttpStatus.NOT_FOUND);
 			}
 			
-			if (employee.getId() == employeeFound.get().getGodown().getManager().getId() && employeeFound.get().getGodown().getId() != employee.getGodown().getId()) {
+			if (employeeFound.get().getGodown() != null && employee.getId() == employeeFound.get().getGodown().getManager().getId() && employeeFound.get().getGodown().getId() != employee.getGodown().getId()) {
 				return new ResponseEntity<String>("This employee is a manager of a godown.", HttpStatus.BAD_REQUEST);
 			}
 			
