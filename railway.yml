@@ -1,0 +1,7 @@
+version: 1
+services:
+  - name: Smart Inventory
+    image: smart_inventory
+    ports:
+      - 80:8080
+    command: docker run -p 80:8080 smart_inventory
